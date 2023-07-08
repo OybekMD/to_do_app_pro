@@ -13,49 +13,29 @@ class ListToDoApiView(generics.ListCreateAPIView):
     permission_classes = (IsOwnerPermission,)
 
 class DetailToDoApiView(generics.RetrieveAPIView):
+    queryset = ToDoListModel.objects.all()
+    serializer_class = TodoSerializer
+    permission_classes = (IsOwnerPermission,)
+
+class CreateToDoApiView(generics.CreateAPIView):
+    queryset = ToDoListModel.objects.all()
+    serializer_class = TodoSerializer
+    permission_classes = (IsOwnerPermission,)
+
+class DeleteToDoApiView(generics.RetrieveDestroyAPIView):
     queryset  = ToDoListModel.objects.all()
     serializer_class = TodoSerializer
     permission_classes = (IsOwnerPermission,)
 
-class CreateToDoApiView(APIView):
-    def post(self,request,*args,**kwargs):
-        try:
-            print(request.data)
-            queryset = ToDoListModel()
-            queryset.task = request.data['task']
-            queryset.save()
-        except:
-            return Response({"message":"please enter task"},400)
-        return Response({'message':'object successfully created'},201)
+class UpdatePatchApiView(generics.RetrieveUpdateAPIView):
+    queryset  = ToDoListModel.objects.all()
+    serializer_class = TodoSerializer
+    permission_classes = (IsOwnerPermission,)
 
-class DeleteToDoApiView(APIView):
-    def delete(self,request,*args,**kwargs):
-        task = get_object_or_404(ToDoListModel,pk=kwargs['task_id'])
-        task.delete()
-        return Response({'message':'object successfully deleted'})
-
-class UpdatePatchApiView(APIView):
-    def patch(self,request,*args,**kwargs):
-        task = get_object_or_404(ToDoListModel,pk=kwargs['task_id'])
-        if 'task' in request.data:
-            task.task = request.data['task']
-            task.save()
-        return Response({"message":"success"})
-
-class UpdatePutApiView(APIView):
-    def put(self,request,*args,**kwargs):
-        task = get_object_or_404(ToDoListModel,pk=kwargs['task_id'])
-        try:
-            task.task = request.data['task']
-            task.status = request.data['status']
-            task.created_at = request.data['created_at']
-            task.update_at = request.data['update_at']
-            task.save()
-        except KeyError:
-            return Response({'message':'please private task, status, created_at and update_at'},400)
-        except RuntimeError:
-            return Response({"message":"Not Found"},500)
-        return Response({"message":"seccessfully update"})
+class UpdatePutApiView(generics.UpdateAPIView):
+    queryset  = ToDoListModel.objects.all()
+    serializer_class = TodoSerializer
+    permission_classes = (IsOwnerPermission,)
 
 class StatusUpdateView(APIView):
     def get(self,request,*args,**kwargs):
